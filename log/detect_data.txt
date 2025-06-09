@@ -1,0 +1,2 @@
+{"timestamp": "2025-06-10 01:30:54", "message": "Log file initialized"}
+{"timestamp": "2025-06-10 01:30:58", "message": "Program ended"}
