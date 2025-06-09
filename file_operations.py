@@ -4,6 +4,7 @@ import json
 class FileOperations:
     def __init__(self, log_file_path="./log/detect_data.txt"):
         self.log_file_path = log_file_path
+        self.last_save_time_stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.__initialize_log_file()
 
     def __initialize_log_file(self):
@@ -13,6 +14,7 @@ class FileOperations:
             "message": "Log file initialized"
         }
         self.__write_log_entry(log_entry)
+        self.last_save_time_stamp = timestamp
 
     def log_program_error(self, message):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -22,6 +24,7 @@ class FileOperations:
             "message": message
         }
         self.__write_log_entry(log_entry)
+        self.last_save_time_stamp = timestamp
 
     def log_program_start(self, success: bool):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -32,26 +35,30 @@ class FileOperations:
             "program_status": status
         }
         self.__write_log_entry(log_entry)
+        self.last_save_time_stamp = timestamp
 
     def log_fatigue_detection(self, behavior):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_entry = {
-            "timestamp": timestamp,
-            "message": f"Fatigue detected",
-            "program_status": "normal",
-            "behavior": behavior
-        }
-        self.__write_log_entry(log_entry)
+        if timestamp != self.last_save_time_stamp:
+            log_entry = {
+                "timestamp": timestamp,
+                "message": f"Fatigue detected",
+                "program_status": "normal",
+                "behavior": behavior
+            }
+            self.__write_log_entry(log_entry)
+        self.last_save_time_stamp = timestamp
 
     def log_fatigue_recovery(self):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_entry = {
             "timestamp": timestamp,
-            "message": "Fatigue recovery, Driver has resumed normal driving",
+            "message": "Fatigue recovery",
             "program_status": "normal",
             "behavior": "normal driving"
         }
         self.__write_log_entry(log_entry)
+        self.last_save_time_stamp = timestamp
 
     def __write_log_entry(self, log_entry):
         with open(self.log_file_path, 'a') as file:

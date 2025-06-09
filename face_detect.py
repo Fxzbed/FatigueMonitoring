@@ -61,11 +61,10 @@ class FaceDetect:
                 raise FileNotFoundError(f"The image at path '{img_src}' does not exist or cannot be read.")
             self.frame, self.gray = preprocess_frame(self.frame, IMAGE_RESIZE_WIDTH)
         except FileNotFoundError as e:
-            print(f"Error: {e}")
+            self.file_operations.log_program_error("img file not found")
             exit(1)
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-            exit(1)
+            raise e
 
     def __detect_face_with_current_frame(self):
         """
@@ -116,7 +115,7 @@ class FaceDetect:
     def __video_detect(self, video_src):
         try:
             self.vid = cv2.VideoCapture(video_src)
-            if self.vid is None:
+            if self.vid is None or not self.vid.isOpened():
                 raise FileNotFoundError(f"The video at path '{video_src}' does not exist or cannot be read.")
             while True:
                 new_frame = self.vid.read()[1]
@@ -124,18 +123,18 @@ class FaceDetect:
                     break
                 self.frame, self.gray = preprocess_frame(new_frame, VIDEO_RESIZE_WIDTH)
                 self.__detect_face_with_current_frame()
-                self.__detect_blinks()
-                if self.is_long_term_closed:
-                    self.file_operations.log_fatigue_detection("长期闭眼")
+                if self.landmarks is not None:
+                    self.__detect_blinks()
+                    if self.is_long_term_closed:
+                        self.file_operations.log_fatigue_detection("eyes closed")
                 cv2.imshow("Video", self.frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
         except FileNotFoundError as e:
-            print(f"Error: {e}")
+            self.file_operations.log_program_error("video file not found")
             exit(1)
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-            exit(1)
+            raise e
 
     def get_face_with_landmarks(self, colors = None, alpha = 0.75):
         if self.landmarks is None:

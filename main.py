@@ -6,10 +6,9 @@ def main():
     args = ShellConfigParser().get_args()
     try:
         face_detector = FaceDetect(args)
-    except FileNotFoundError:
-        face_detector.file_operations.log_program_start(False)
     except Exception as e:
-        face_detector.file_operations.log_error(e)
+        print(f"An unexpected error occurred: {e}")
+
 
 if __name__ == '__main__':
     main()
